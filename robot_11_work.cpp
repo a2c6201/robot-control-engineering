@@ -1,7 +1,11 @@
 #include <stdio.h>
-#include <pybind11/embed.h>
-namespace py = pybind11;
+#include <iostream>
+#include <fstream>
 
+// 問題の理解
+// パラメーターの意味
+// ルンゲクッタ法の意味
+// コメントの追加
 
 // パラメーター
 const double theta_d = 1.0;  // 目標角度 (rad)
@@ -50,24 +54,28 @@ void runge_kutta(double y[], double h) {
 }
 
 int main() {
-    py::scoped_interpreter guard{}; // Start the interpreter
+    std::ofstream data("data.txt");// Start the interpreter
 
     double y[2] = {0, 0};  // Initial conditions: [theta, omega]
-
-    py::list t, y;
     for (double t = 0; t <= t_max; t += h) {
         printf("Time: %.3f, Theta: %.5f\n", t, y[0]);
         // グラフ描画
-        t.append(t);
-        y.append(y[0]);
+        data << t << " " << y[0] << std::endl; // Write the data to the file
         // ランゲクッタ法によるシミュレーション
         runge_kutta(y, h);
     }
+    data.close();
 
     // グラフ描画
-    py::object plt = py::module::import("matplotlib.pyplot");
-    plt.attr("plot")(x, y);
-    plt.attr("show")();
+    FILE *gp = popen("gnuplot -persist", "w");
+    if (gp == NULL) {
+        std::cerr << "Cannot open pipe to gnuplot" << std::endl;
+        return 1;
+    }
 
+    fprintf(gp, "plot 'data.txt' with lines\n");
+    fflush(gp);
+
+    pclose(gp);
     return 0;
 }
