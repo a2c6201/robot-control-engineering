@@ -56,6 +56,7 @@ void runge_kutta(double y[], double h) {
 }
 
 int main() {
+    // ファイルを開く
     std::ofstream data("data.txt");
 
     double y[2] = {0, 0};  // y[0] = 角度、y[1] = 角速度
@@ -75,6 +76,7 @@ int main() {
         return 1;
     }
 
+    // fprintfはファイルに書き込む関数
     fprintf(gp, "plot 'data.txt' with lines\n");
     fflush(gp);
 
